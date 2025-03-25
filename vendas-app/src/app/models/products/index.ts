@@ -1,9 +1,10 @@
 export interface Product {
-  id?: number;
+  id?: string;
   name?: string;
   description?: string;
   price?: number;
   sku?: string;
+  registrationDate?: string;
 }
 
 const product: Product = {};

@@ -9,6 +9,8 @@ export const CadastroProdutos: React.FC = () => {
   const [price, setPrice] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [id, setId] = useState<string>('');
+  const [registrationDate, setRegistrationDate] = useState<string>('');
 
   const submit = () => {
     const product: Product = {
@@ -18,13 +20,34 @@ export const CadastroProdutos: React.FC = () => {
       description,
     };
 
-    service
-      .save(product)
-      .then((productResponse) => console.log(productResponse));
+    service.save(product).then((productResponse: Product) => {
+      setId(productResponse.id ?? '');
+      setRegistrationDate(productResponse.registrationDate ?? '');
+    });
   };
 
   return (
     <Layout titulo='Products'>
+      {id && (
+        <div className='columns'>
+          <Input
+            label='ID:'
+            columnClasses='is-half'
+            id='inputId'
+            value={id}
+            disabled
+          />
+
+          <Input
+            label='Registration date:'
+            columnClasses='is-half'
+            id='inputRegistrationDate'
+            value={registrationDate}
+            disabled
+          />
+        </div>
+      )}
+
       <div className='columns'>
         <Input
           label='SKU: *'
@@ -32,7 +55,7 @@ export const CadastroProdutos: React.FC = () => {
           onChange={setSku}
           id='inputSku'
           value={sku}
-          placeholder='Digite o SKU do produto.'
+          placeholder='Enter the product SKU'
         />
 
         <Input
@@ -41,7 +64,6 @@ export const CadastroProdutos: React.FC = () => {
           onChange={setPrice}
           id='inputPreco'
           value={price}
-          placeholder='Digite o preço do produto.'
         />
       </div>
 
@@ -52,7 +74,7 @@ export const CadastroProdutos: React.FC = () => {
           onChange={setName}
           id='inputNome'
           value={name}
-          placeholder='Digite o nome do produto.'
+          placeholder='Enter the product name'
         />
       </div>
 
@@ -67,7 +89,7 @@ export const CadastroProdutos: React.FC = () => {
               id='inputDescription'
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder='Digite a descrição detalhada do produto'
+              placeholder='Enter the detailed product description'
             />
           </div>
         </div>
