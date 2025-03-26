@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Layout, Input } from 'components';
 import { useProductService } from 'app/services';
 import { Product } from 'app/models/products';
+import { convertToBigDecimal } from 'app/util/currency';
 
 export const CadastroProdutos: React.FC = () => {
   const service = useProductService();
@@ -14,16 +15,23 @@ export const CadastroProdutos: React.FC = () => {
 
   const submit = () => {
     const product: Product = {
+      id,
       sku,
-      price: parseFloat(price),
+      price: convertToBigDecimal(price),
       name,
       description,
     };
 
-    service.save(product).then((productResponse: Product) => {
-      setId(productResponse.id ?? '');
-      setRegistrationDate(productResponse.registrationDate ?? '');
-    });
+    if (id) {
+      service
+        .update(product)
+        .then((productResponse) => console.log('atualizado.'));
+    } else {
+      service.save(product).then((productResponse: Product) => {
+        setId(productResponse.id ?? '');
+        setRegistrationDate(productResponse.registrationDate ?? '');
+      });
+    }
   };
 
   return (
@@ -62,8 +70,11 @@ export const CadastroProdutos: React.FC = () => {
           label='Price: *'
           columnClasses='is-half'
           onChange={setPrice}
-          id='inputPreco'
+          id='inputPrice'
           value={price}
+          maxLength={16}
+          currency
+          placeholder='Enter the product price'
         />
       </div>
 
@@ -72,7 +83,7 @@ export const CadastroProdutos: React.FC = () => {
           label='Name: *'
           columnClasses='is-full'
           onChange={setName}
-          id='inputNome'
+          id='inputName'
           value={name}
           placeholder='Enter the product name'
         />
@@ -80,7 +91,7 @@ export const CadastroProdutos: React.FC = () => {
 
       <div className='columns'>
         <div className='field column is-full'>
-          <label className='label' htmlFor='inputDescricao'>
+          <label className='label' htmlFor='inputDescription'>
             Description
           </label>
           <div className='control'>
@@ -97,7 +108,7 @@ export const CadastroProdutos: React.FC = () => {
       <div className='field is-grouped'>
         <div className='control'>
           <button onClick={submit} className='button is-link'>
-            Save
+            {id ? 'Update' : 'Save'}
           </button>
         </div>
         <div className='control'>
