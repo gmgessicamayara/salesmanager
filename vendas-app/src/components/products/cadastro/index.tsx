@@ -1,9 +1,28 @@
 import { useState } from 'react';
-import { Layout, Input } from 'components';
+import { Layout, Input, Message } from 'components';
 import { useProductService } from 'app/services';
 import { Product } from 'app/models/products';
 import { convertToBigDecimal } from 'app/util/currency';
+import { Alert } from 'components/common/message';
+import * as yup from 'yup';
 
+const msgRequiredField = 'Required field';
+const validations = yup.object().shape({
+  sku: yup.string().trim().required(msgRequiredField),
+  name: yup.string().trim().required(msgRequiredField),
+  description: yup.string().trim().required(msgRequiredField),
+  price: yup
+    .number()
+    .required(msgRequiredField)
+    .moreThan(0, 'The value must be greater than 0,00 (zero)'),
+});
+
+interface FormErrors {
+  sku?: string;
+  name?: string;
+  description?: string;
+  price?: string;
+}
 export const CadastroProdutos: React.FC = () => {
   const service = useProductService();
   const [sku, setSku] = useState<string>('');
@@ -12,6 +31,8 @@ export const CadastroProdutos: React.FC = () => {
   const [description, setDescription] = useState<string>('');
   const [id, setId] = useState<string>('');
   const [registrationDate, setRegistrationDate] = useState<string>('');
+  const [messages, setMessages] = useState<Array<Alert>>([]);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const submit = () => {
     const product: Product = {
@@ -22,20 +43,44 @@ export const CadastroProdutos: React.FC = () => {
       description,
     };
 
-    if (id) {
-      service
-        .update(product)
-        .then((productResponse) => console.log('atualizado.'));
-    } else {
-      service.save(product).then((productResponse: Product) => {
-        setId(productResponse.id ?? '');
-        setRegistrationDate(productResponse.registrationDate ?? '');
+    validations
+      .validate(product)
+      .then((productValidated) => {
+        setErrors({});
+        if (id) {
+          service.update(product).then((productResponse) => {
+            setMessages([
+              {
+                type: 'success',
+                text: 'Product updated successfully.',
+              },
+            ]);
+          });
+        } else {
+          service.save(product).then((productResponse: Product) => {
+            setId(productResponse.id ?? '');
+            setRegistrationDate(productResponse.registrationDate ?? '');
+            setMessages([
+              {
+                type: 'success',
+                text: 'Product registered successfully.',
+              },
+            ]);
+          });
+        }
+      })
+      .catch((error) => {
+        const field = error.path;
+        const message = error.message;
+
+        setErrors({
+          [field]: message,
+        });
       });
-    }
   };
 
   return (
-    <Layout titulo='Products'>
+    <Layout titulo='Products' messages={messages}>
       {id && (
         <div className='columns'>
           <Input
@@ -64,6 +109,7 @@ export const CadastroProdutos: React.FC = () => {
           id='inputSku'
           value={sku}
           placeholder='Enter the product SKU'
+          error={errors.sku}
         />
 
         <Input
@@ -75,6 +121,7 @@ export const CadastroProdutos: React.FC = () => {
           maxLength={16}
           currency
           placeholder='Enter the product price'
+          error={errors.price}
         />
       </div>
 
@@ -86,6 +133,7 @@ export const CadastroProdutos: React.FC = () => {
           id='inputName'
           value={name}
           placeholder='Enter the product name'
+          error={errors.name}
         />
       </div>
 
@@ -102,6 +150,9 @@ export const CadastroProdutos: React.FC = () => {
               onChange={(event) => setDescription(event.target.value)}
               placeholder='Enter the detailed product description'
             />
+            {errors.description && (
+              <p className='help is-danger'>{errors.description}</p>
+            )}
           </div>
         </div>
       </div>

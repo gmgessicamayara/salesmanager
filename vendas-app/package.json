@@ -15,7 +15,8 @@
     "postcss": "^8.4.49",
     "postcss-scss": "^4.0.9",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@types/node": "^14.14.31",
