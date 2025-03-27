@@ -1,1 +1,2 @@
-export { CadastroProdutos } from './cadastro'
+export { ProductRegistration } from './record';
+export { ProductList } from './recordList';

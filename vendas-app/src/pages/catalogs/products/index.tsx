@@ -1,3 +1,3 @@
-import { CadastroProdutos } from 'components'
+import { ProductRegistration } from 'components';
 
-export default CadastroProdutos
+export default ProductRegistration;

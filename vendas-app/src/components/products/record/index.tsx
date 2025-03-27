@@ -4,6 +4,8 @@ import { useProductService } from 'app/services';
 import { Product } from 'app/models/products';
 import { convertToBigDecimal } from 'app/util/currency';
 import { Alert } from 'components/common/message';
+import Link from 'next/link';
+
 import * as yup from 'yup';
 
 const msgRequiredField = 'Required field';
@@ -23,7 +25,7 @@ interface FormErrors {
   description?: string;
   price?: string;
 }
-export const CadastroProdutos: React.FC = () => {
+export const ProductRegistration: React.FC = () => {
   const service = useProductService();
   const [sku, setSku] = useState<string>('');
   const [price, setPrice] = useState<string>('');
@@ -163,7 +165,9 @@ export const CadastroProdutos: React.FC = () => {
           </button>
         </div>
         <div className='control'>
-          <button className='button'>Back</button>
+          <Link href='/searches/products'>
+            <button className='button'>Back</button>
+          </Link>
         </div>
       </div>
     </Layout>

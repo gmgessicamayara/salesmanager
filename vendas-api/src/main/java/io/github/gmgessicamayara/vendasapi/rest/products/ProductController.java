@@ -6,9 +6,11 @@ import io.github.gmgessicamayara.vendasapi.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -17,6 +19,14 @@ public class ProductController {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @GetMapping
+    public List<ProductDTO> getAll(){
+        return productRepository.findAll().stream()
+                .map(ProductDTO::modelToDto)
+                .collect(Collectors.toList());
+    }
+
 
     @PostMapping
     public ProductDTO save(@RequestBody ProductDTO product) {
