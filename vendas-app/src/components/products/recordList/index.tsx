@@ -1,4 +1,4 @@
-import { Layout } from 'components/layout';
+import { Layout, Loader } from 'components';
 import Link from 'next/link';
 import { ProductsTable } from './table';
 import { Product } from 'app/models/products';
@@ -12,10 +12,6 @@ export const ProductList: React.FC = () => {
     (url) => httpClient.get(url)
   );
 
-  if (!result) {
-    return <div>Carregando</div>;
-  }
-
   return (
     <Layout titulo='Products'>
       <Link href='/catalogs/products'>
@@ -23,7 +19,8 @@ export const ProductList: React.FC = () => {
         <br />
       </Link>
       <br />
-      <ProductsTable products={result.data} />
+      <Loader show={!result} />
+      <ProductsTable products={result?.data || []} />
     </Layout>
   );
 };

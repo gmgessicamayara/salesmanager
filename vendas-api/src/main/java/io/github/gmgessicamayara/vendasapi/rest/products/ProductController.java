@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,7 +25,6 @@ public class ProductController {
                 .map(ProductDTO::modelToDto)
                 .collect(Collectors.toList());
     }
-
 
     @PostMapping
     public ProductDTO save(@RequestBody ProductDTO product) {
