@@ -36,7 +36,7 @@ export const Input: React.FC<InputProps> = ({
         {label}
       </label>
       <div className='control'>
-        <input className='input' id={id} {...props} onChange={onInputChange} />
+        <input className='input' id={id} onChange={onInputChange} {...props} />
         {error && <p className='help is-danger'>{error}</p>}
       </div>
     </div>

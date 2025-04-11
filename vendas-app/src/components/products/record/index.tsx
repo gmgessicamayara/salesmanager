@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout, Input, Message } from 'components';
 import { useProductService } from 'app/services';
 import { Product } from 'app/models/products';
-import { convertToBigDecimal } from 'app/util/currency';
+import { convertToBigDecimal, formatToBRL } from 'app/util/currency';
 import { Alert } from 'components/common/message';
 import Link from 'next/link';
-
 import * as yup from 'yup';
+import { useRouter } from 'next/router';
 
 const msgRequiredField = 'Required field';
+
 const validations = yup.object().shape({
   sku: yup.string().trim().required(msgRequiredField),
   name: yup.string().trim().required(msgRequiredField),
@@ -35,6 +36,22 @@ export const ProductRegistration: React.FC = () => {
   const [registrationDate, setRegistrationDate] = useState<string>('');
   const [messages, setMessages] = useState<Array<Alert>>([]);
   const [errors, setErrors] = useState<FormErrors>({});
+  const router = useRouter();
+  const { id: queryId } = router.query;
+
+  useEffect(() => {
+    if (queryId) {
+      service.getProduct(queryId).then((productFound) => {
+        console.log('Produto vindo da API:', productFound);
+        setId(productFound.id!);
+        setSku(productFound.sku!);
+        setName(productFound.name!);
+        setDescription(productFound.description!);
+        setRegistrationDate(productFound.registrationDate || '');
+        setPrice(formatToBRL(`${productFound.price}`));
+      });
+    }
+  }, [queryId]);
 
   const submit = () => {
     const product: Product = {
@@ -133,6 +150,7 @@ export const ProductRegistration: React.FC = () => {
           columnClasses='is-full'
           onChange={setName}
           id='inputName'
+          key={`input-name-${id}`}
           value={name}
           placeholder='Enter the product name'
           error={errors.name}
@@ -148,6 +166,7 @@ export const ProductRegistration: React.FC = () => {
             <textarea
               className='textarea'
               id='inputDescription'
+              key={`input-description-${id}`}
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               placeholder='Enter the detailed product description'

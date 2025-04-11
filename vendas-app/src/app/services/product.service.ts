@@ -1,6 +1,6 @@
 import { httpClient } from 'app/http';
 import { Product } from 'app/models/products';
-import { AxiosResponse } from 'axios';
+import { Axios, AxiosResponse } from 'axios';
 const resourceURL: string = '/api/products';
 
 export const useProductService = () => {
@@ -17,8 +17,15 @@ export const useProductService = () => {
     await httpClient.put<Product>(url, product);
   };
 
+  const getProduct = async (id): Promise<Product> => {
+    const url: string = `${resourceURL}/${id}`;
+    const response: AxiosResponse<Product> = await httpClient.get(url);
+    return response.data;
+  };
+
   return {
     save,
     update,
+    getProduct,
   };
 };

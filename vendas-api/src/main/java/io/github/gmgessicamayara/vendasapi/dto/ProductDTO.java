@@ -14,8 +14,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ProductDTO {
     private Long id;
-    private String description;
     private String name;
+    private String description;
     private BigDecimal price;
     private String sku;
 

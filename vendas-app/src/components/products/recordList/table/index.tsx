@@ -2,9 +2,15 @@ import { Product } from 'app/models/products';
 
 interface TableProductsProps {
   products: Array<Product>;
+  onEdit: (product) => void;
+  onDelete: (product) => void;
 }
 
-export const ProductsTable: React.FC<TableProductsProps> = ({ products }) => {
+export const ProductsTable: React.FC<TableProductsProps> = ({
+  products,
+  onEdit,
+  onDelete,
+}) => {
   return (
     <table className='table is-hoverable'>
       <thead>
@@ -20,7 +26,12 @@ export const ProductsTable: React.FC<TableProductsProps> = ({ products }) => {
       </thead>
       <tbody>
         {products.map((product) => (
-          <ProductRow key={product.id} product={product} />
+          <ProductRow
+            onDelete={onDelete}
+            onEdit={onEdit}
+            key={product.id}
+            product={product}
+          />
         ))}
       </tbody>
     </table>
@@ -29,9 +40,15 @@ export const ProductsTable: React.FC<TableProductsProps> = ({ products }) => {
 
 interface ProducttRowProps {
   product: Product;
+  onEdit: (product) => void;
+  onDelete: (product) => void;
 }
 
-const ProductRow: React.FC<ProducttRowProps> = ({ product }) => {
+const ProductRow: React.FC<ProducttRowProps> = ({
+  product,
+  onEdit,
+  onDelete,
+}) => {
   return (
     <tr>
       <td>{product.id}</td>
@@ -41,9 +58,19 @@ const ProductRow: React.FC<ProducttRowProps> = ({ product }) => {
       <td>{product.description}</td>
       <td>{product.registrationDate}</td>
       <td>
-        <button className='button is-success'>Edit</button>
+        <button
+          onClick={(e) => onEdit(product)}
+          className='button is-small is-success'
+        >
+          Edit
+        </button>
 
-        <button className='button is-danger'>Delete</button>
+        <button
+          onClick={(e) => onDelete(product)}
+          className='button is-small is-danger'
+        >
+          Delete
+        </button>
       </td>
     </tr>
   );

@@ -1,9 +1,9 @@
 export interface Product {
   id?: string;
-  name?: string;
-  description?: string;
-  price?: number;
   sku?: string;
+  name?: string;
+  price?: number;
+  description?: string;
   registrationDate?: string;
 }
 

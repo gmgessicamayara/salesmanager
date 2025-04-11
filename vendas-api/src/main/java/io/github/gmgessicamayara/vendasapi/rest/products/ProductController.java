@@ -25,6 +25,19 @@ public class ProductController {
                 .map(ProductDTO::modelToDto)
                 .collect(Collectors.toList());
     }
+    @GetMapping("{id}")
+    public ResponseEntity<ProductDTO> getById(@PathVariable Long id){
+
+       Optional<Product> productFound = productRepository.findById(id);
+        if (productFound.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+          var product = productFound.map(ProductDTO::modelToDto).get();
+
+        System.out.println("Produto retornado do banco: " + product);
+
+        return ResponseEntity.ok(product);
+    }
 
     @PostMapping
     public ProductDTO save(@RequestBody ProductDTO product) {
