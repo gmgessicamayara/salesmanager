@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.ResponseEntity.*;
+
 @RestController
 @RequestMapping("/api/products")
 @CrossOrigin("*")
@@ -20,23 +22,24 @@ public class ProductController {
     private ProductRepository productRepository;
 
     @GetMapping
-    public List<ProductDTO> getAll(){
+    public List<ProductDTO> getAll() {
         return productRepository.findAll().stream()
                 .map(ProductDTO::modelToDto)
                 .collect(Collectors.toList());
     }
-    @GetMapping("{id}")
-    public ResponseEntity<ProductDTO> getById(@PathVariable Long id){
 
-       Optional<Product> productFound = productRepository.findById(id);
+    @GetMapping("{id}")
+    public ResponseEntity<ProductDTO> getById(@PathVariable Long id) {
+
+        Optional<Product> productFound = productRepository.findById(id);
         if (productFound.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return notFound().build();
         }
-          var product = productFound.map(ProductDTO::modelToDto).get();
+        var product = productFound.map(ProductDTO::modelToDto).get();
 
         System.out.println("Produto retornado do banco: " + product);
 
-        return ResponseEntity.ok(product);
+        return ok(product);
     }
 
     @PostMapping
@@ -52,13 +55,24 @@ public class ProductController {
         Optional<Product> entityFounded = productRepository.findById(id);
 
         if (entityFounded.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return notFound().build();
         }
         Product entityProduct = product.dtoToModel();
         entityProduct.setId(id);
         productRepository.save(entityProduct);
 
-        return ResponseEntity.ok().build();
+        return ok().build();
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        Optional<Product> entityFounded = productRepository.findById(id);
+        if (entityFounded.isEmpty()) {
+            return notFound().build();
+        }
+        productRepository.delete(entityFounded.get());
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

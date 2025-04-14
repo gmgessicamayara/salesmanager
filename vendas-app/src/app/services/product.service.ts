@@ -4,7 +4,7 @@ import { Axios, AxiosResponse } from 'axios';
 const resourceURL: string = '/api/products';
 
 export const useProductService = () => {
-  const save = async (product: Product): Promise<Product> => {
+  const saveProduct = async (product: Product): Promise<Product> => {
     const response: AxiosResponse<Product> = await httpClient.post<Product>(
       resourceURL,
       product
@@ -12,7 +12,7 @@ export const useProductService = () => {
     return response.data;
   };
 
-  const update = async (product: Product): Promise<void> => {
+  const updateProduct = async (product: Product): Promise<void> => {
     const url: string = `${resourceURL}/${product.id}`;
     await httpClient.put<Product>(url, product);
   };
@@ -23,9 +23,15 @@ export const useProductService = () => {
     return response.data;
   };
 
+  const deleteProduct = async (id): Promise<void> => {
+    const url: string = `${resourceURL}/${id}`;
+    await httpClient.delete(url);
+  };
+
   return {
-    save,
-    update,
+    saveProduct,
+    updateProduct,
     getProduct,
+    deleteProduct,
   };
 };

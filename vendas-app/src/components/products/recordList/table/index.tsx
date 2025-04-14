@@ -1,4 +1,5 @@
 import { Product } from 'app/models/products';
+import { useState } from 'react';
 
 interface TableProductsProps {
   products: Array<Product>;
@@ -49,6 +50,19 @@ const ProductRow: React.FC<ProducttRowProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const [removing, setRemoving] = useState<boolean>(false);
+
+  const onDeleteClick = (product: Product) => {
+    if (removing) {
+      onDelete(product);
+      setRemoving(false);
+    } else {
+      setRemoving(true);
+    }
+  };
+
+  const cancelDelete = () => setRemoving(false);
+
   return (
     <tr>
       <td>{product.id}</td>
@@ -58,19 +72,26 @@ const ProductRow: React.FC<ProducttRowProps> = ({
       <td>{product.description}</td>
       <td>{product.registrationDate}</td>
       <td>
-        <button
-          onClick={(e) => onEdit(product)}
-          className='button is-small is-success'
-        >
-          Edit
-        </button>
+        {!removing && (
+          <button
+            onClick={(e) => onEdit(product)}
+            className='button is-small is-success'
+          >
+            Edit
+          </button>
+        )}
 
         <button
-          onClick={(e) => onDelete(product)}
+          onClick={(e) => onDeleteClick(product)}
           className='button is-small is-danger'
         >
-          Delete
+          {removing ? 'Please Confirm' : 'Delete'}
         </button>
+        {removing && (
+          <button onClick={cancelDelete} className='button is-small'>
+            Cancel
+          </button>
+        )}
       </td>
     </tr>
   );

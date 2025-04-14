@@ -67,7 +67,7 @@ export const ProductRegistration: React.FC = () => {
       .then((productValidated) => {
         setErrors({});
         if (id) {
-          service.update(product).then((productResponse) => {
+          service.updateProduct(product).then((productResponse) => {
             setMessages([
               {
                 type: 'success',
@@ -76,7 +76,7 @@ export const ProductRegistration: React.FC = () => {
             ]);
           });
         } else {
-          service.save(product).then((productResponse: Product) => {
+          service.saveProduct(product).then((productResponse: Product) => {
             setId(productResponse.id ?? '');
             setRegistrationDate(productResponse.registrationDate ?? '');
             setMessages([

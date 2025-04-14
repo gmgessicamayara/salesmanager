@@ -6,25 +6,43 @@ import useSWR from 'swr';
 import { httpClient } from 'app/http';
 import { AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
+import { useProductService } from 'app/services';
+import { useEffect, useState } from 'react';
+import { Alert } from 'components/common/message';
 
 export const ProductList: React.FC = () => {
+  const router = useRouter();
+  const service = useProductService();
+  const [messages, setMessages] = useState<Array<Alert>>([]);
+
   const { data: result, error } = useSWR<AxiosResponse<Product[]>>(
     '/api/products',
     (url) => httpClient.get(url)
   );
 
-  const router = useRouter();
+  const [productList, setProductList] = useState<Product[]>([]);
+
+  useEffect(() => {
+    setProductList(result?.data || []);
+  }, [result]);
+
   const editProduct = (product: Product) => {
     const url = `/catalogs/products?id=${product.id}`;
     router.push(url);
   };
 
   const deleteProduct = (product: Product) => {
-    console.log(product);
+    service.deleteProduct(product.id).then((response) => {
+      setMessages([{ type: 'success', text: 'Product deleted successfully.' }]);
+    });
+    const modifiedList: Product[] = productList?.filter(
+      (p) => p.id !== product.id
+    );
+    setProductList(modifiedList);
   };
 
   return (
-    <Layout titulo='Products'>
+    <Layout titulo='Products' messages={messages}>
       <Link href='/catalogs/products'>
         <button className='button is-link'>New</button>
         <br />
@@ -34,7 +52,7 @@ export const ProductList: React.FC = () => {
       <ProductsTable
         onDelete={deleteProduct}
         onEdit={editProduct}
-        products={result?.data || []}
+        products={productList}
       />
     </Layout>
   );
