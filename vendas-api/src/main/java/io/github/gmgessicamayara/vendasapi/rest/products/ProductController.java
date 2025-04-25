@@ -36,18 +36,15 @@ public class ProductController {
             return notFound().build();
         }
         var product = productFound.map(ProductDTO::modelToDto).get();
-
-        System.out.println("Produto retornado do banco: " + product);
-
         return ok(product);
     }
 
     @PostMapping
-    public ProductDTO save(@RequestBody ProductDTO product) {
+    public ResponseEntity save(@RequestBody ProductDTO product) {
 
         Product entityProduct = product.dtoToModel();
         productRepository.save(entityProduct);
-        return ProductDTO.modelToDto(entityProduct);
+        return ResponseEntity.ok(ProductDTO.modelToDto(entityProduct));
     }
 
     @PutMapping("{id}")

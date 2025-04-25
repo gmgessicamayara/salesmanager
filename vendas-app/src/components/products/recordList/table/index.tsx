@@ -1,5 +1,8 @@
-import { Product } from 'app/models/products';
-import { useState } from 'react';
+import { Product } from "app/models/products";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Button } from "primereact/button";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 
 interface TableProductsProps {
   products: Array<Product>;
@@ -12,87 +15,44 @@ export const ProductsTable: React.FC<TableProductsProps> = ({
   onEdit,
   onDelete,
 }) => {
-  return (
-    <table className='table is-hoverable'>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>SKU</th>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Description</th>
-          <th>Registration date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {products.map((product) => (
-          <ProductRow
-            onDelete={onDelete}
-            onEdit={onEdit}
-            key={product.id}
-            product={product}
-          />
-        ))}
-      </tbody>
-    </table>
-  );
-};
+  const actionTemplate = (rowData: Product) => {
+    return (
+      <div className="buttons is-right">
+        <Button
+          label="Edit"
+          className="button is-small is-success"
+          onClick={(e) => onEdit(rowData)}
+        />
 
-interface ProducttRowProps {
-  product: Product;
-  onEdit: (product) => void;
-  onDelete: (product) => void;
-}
-
-const ProductRow: React.FC<ProducttRowProps> = ({
-  product,
-  onEdit,
-  onDelete,
-}) => {
-  const [removing, setRemoving] = useState<boolean>(false);
-
-  const onDeleteClick = (product: Product) => {
-    if (removing) {
-      onDelete(product);
-      setRemoving(false);
-    } else {
-      setRemoving(true);
-    }
+        <Button
+          label="Delete"
+          className="button is-small is-danger"
+          onClick={(e) => {
+            confirmPopup({
+              target: e.currentTarget,
+              icon: "pi pi-exclamation-triangle",
+              message: "Are you sure you want to delete this product?",
+              acceptLabel: "Yes",
+              rejectLabel: "No",
+              className: "p-confirm-popup-sm",
+              accept: () => {
+                onDelete(rowData);
+              },
+            });
+          }}
+        />
+        <ConfirmPopup />
+      </div>
+    );
   };
 
-  const cancelDelete = () => setRemoving(false);
-
   return (
-    <tr>
-      <td>{product.id}</td>
-      <td>{product.sku}</td>
-      <td>{product.name}</td>
-      <td>{product.price}</td>
-      <td>{product.description}</td>
-      <td>{product.registrationDate}</td>
-      <td>
-        {!removing && (
-          <button
-            onClick={(e) => onEdit(product)}
-            className='button is-small is-success'
-          >
-            Edit
-          </button>
-        )}
-
-        <button
-          onClick={(e) => onDeleteClick(product)}
-          className='button is-small is-danger'
-        >
-          {removing ? 'Please Confirm' : 'Delete'}
-        </button>
-        {removing && (
-          <button onClick={cancelDelete} className='button is-small'>
-            Cancel
-          </button>
-        )}
-      </td>
-    </tr>
+    <DataTable value={products} paginator rows={5} stripedRows>
+      <Column field="id" header="ID" sortable></Column>
+      <Column field="sku" header="SKU" sortable></Column>
+      <Column field="name" header="Name" sortable></Column>
+      <Column field="price" header="Price" sortable></Column>
+      <Column field="actions" header="Actions" body={actionTemplate}></Column>
+    </DataTable>
   );
 };

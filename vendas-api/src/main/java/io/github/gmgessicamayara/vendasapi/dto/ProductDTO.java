@@ -19,7 +19,7 @@ public class ProductDTO {
     private BigDecimal price;
     private String sku;
 
-    @JsonFormat(pattern = "d/MM/yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate registrationDate;
 
     public Product dtoToModel() {
