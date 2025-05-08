@@ -1,7 +1,7 @@
-import { httpClient } from 'app/http';
-import { Product } from 'app/models/products';
-import { Axios, AxiosResponse } from 'axios';
-const resourceURL: string = '/api/products';
+import { httpClient } from "app/http";
+import { Product } from "app/models/products";
+import { Axios, AxiosResponse } from "axios";
+const resourceURL: string = "/api/products";
 
 export const useProductService = () => {
   const saveProduct = async (product: Product): Promise<Product> => {
@@ -28,10 +28,18 @@ export const useProductService = () => {
     await httpClient.delete(url);
   };
 
+  const listProducts = async (): Promise<Product[]> => {
+    const response: AxiosResponse<Product[]> = await httpClient.get(
+      resourceURL
+    );
+    return response.data;
+  };
+
   return {
     saveProduct,
     updateProduct,
     getProduct,
+    listProducts,
     deleteProduct,
   };
 };
