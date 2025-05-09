@@ -15,6 +15,12 @@ import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Dropdown } from "primereact/dropdown";
+
+const formatterToBRL = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
 
 interface SalesFormProps {
   onSubmit: (sale: Sale) => void;
@@ -28,6 +34,7 @@ const formSchema: Sale = {
 };
 
 export const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
+  const paymentMethods: String[] = ["Money", "Credit Card", "Debit Card"];
   const customerService = useCustomerService();
   const productService = useProductService();
   const [productList, setProductList] = useState<Product[]>([]);
@@ -110,6 +117,19 @@ export const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
     setProduct({});
     setProductID("");
     setProductQuantity(0);
+    const total = totalPrice();
+    formik.setFieldValue("totalPrice", total);
+  };
+
+  const totalPrice = () => {
+    const total: number[] = (formik.values.itens ?? []).map(
+      (si) => si.quantity * (si.product.price ?? 0)
+    );
+    if (total.length) {
+      return total.reduce((acc = 0, curr) => acc + curr);
+    } else {
+      return 0;
+    }
   };
 
   const disableAddProductButton = () => {
@@ -156,7 +176,6 @@ export const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
               />
             </div>
           </div>
-
           <div className="col-2">
             <div className="p-filed">
               <span className="p-float-label">
@@ -171,7 +190,6 @@ export const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
               </span>
             </div>
           </div>
-
           <div className="col-2">
             <div className="p-filed">
               <Button
@@ -193,10 +211,55 @@ export const SalesForm: React.FC<SalesFormProps> = ({ onSubmit }) => {
                 field="total"
                 header="Total"
                 body={(si: SaleItem) => {
-                  return <div>{(si.product.price ?? 0) * si.quantity}</div>;
+                  const total = (si.product.price ?? 0) * si.quantity;
+                  return <div>{formatterToBRL.format(total)}</div>;
                 }}
               />
             </DataTable>
+          </div>
+        </div>
+        <div className="grid">
+          <div className="col-5">
+            <div className="p-field">
+              <label htmlFor="paymentMethod">Payment Method: *</label>
+              <Dropdown
+                id="paymentMethod"
+                options={paymentMethods}
+                value={formik.values.paymentMethod}
+                onChange={(e) => formik.setFieldValue("paymentMethod", e.value)}
+                placeholder="Select a payment method"
+              />
+            </div>
+          </div>
+
+          <div className="col-3">
+            <div className="p-field">
+              <label htmlFor="itens">Itens</label>
+              <InputText
+                disabled
+                value={
+                  formik.values.itens?.length
+                    ? formik.values.itens.length.toString()
+                    : "0"
+                }
+                id="items"
+              />
+            </div>
+          </div>
+
+          <div className="col-4">
+            <div className="p-field">
+              <label htmlFor="total">Total</label>
+              <InputText
+                disabled
+                value={
+                  formik.values.totalPrice !== undefined
+                    ? String(formatterToBRL.format(formik.values.totalPrice))
+                    : ""
+                }
+                id="total"
+              />
+            </div>
           </div>
         </div>
         <br />
